@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 class XASession:
-    login_state = 0     # login stats check
+    login_state=0     # login stats check
 
     def OnLogin(self, code, msg):   # call after login
         if(code == "0000"): # login success
@@ -50,7 +50,7 @@ class EBest:
         XASession.login_state = 0
         self.xa_session_client.DisconnectServer()
 
-    def _excute_query(self, res, in_block_name, out_block_name, *out_fields, **set_fields):
+    def _execute_query(self, res, in_block_name, out_block_name, *out_fields, **set_fields):
         '''
         res(str)             : 리소스 이름(TR)
         in_block_name(str)   : 인 블록 이름
@@ -69,7 +69,7 @@ class EBest:
             self.query_cnt = list(filter(lambda x: (datetime.today() - x).total_second() < EBest.LIMIT_SECONDS, self.query_cnt))
         
         xa_query = win32com.client.DispatchWithEvents("XA_DataSet.XAQuery", XAQuery)
-        xa_query.LoadFromResFile(XAQuery.RES_PATH + res + " .res")
+        xa_query.LoadFromResFile(XAQuery.RES_PATH + res + ".res")
         
         # in_block_name setting
         for key, value in set_fields.items():
@@ -112,6 +112,118 @@ class EBest:
         
         return result
 
+
+    def get_code_list(self, market=None):
+        """
+        TR: t8436 코스피, 코스닥의 종목 리스트를 가져온다
+        :param market:str 전체(0), 코스피(1), 코스닥(2)
+        :return result:list 시장별 종목 리스트
+        """
+        if market != "ALL" and market != "KOSPI" and market != "KOSDAQ":
+            raise Exception("Need to market param(ALL, KOSPI, KOSDAQ)")
+
+        market_code = {"ALL": "0", "KOSPI":"1", "KOSDAQ":"2"}
+        in_params = {"gubun":market_code[market]}
+        out_params = ['hname', 'shcode', 'expcode', 'etfgubun', 'memedan', 'gubun', 'spac_gubun']
+        result = self._execute_query("t8436", "t8436InBlock", "t8436OutBlock", *out_params, **in_params)
+
+        return result
+
+
+    def get_stock_price_by_code(self, code=None, cnt="1"):
+        """TR: t1305 현재 날짜를 기준으로 cnt 만큼 전일의 데이터를 가져온다
+        :param code:str 종목코드
+        :param cnt:str 데이터 범위
+        :return result:list 종목의 최근 가격 정보
+        """
+        in_params = {"shcode":code, "dwmcode": "1", "date":"", "idx":"", "cnt":cnt}
+        out_params =['date', 'open', 'high', 'low', 'close', 'sign', 
+                    'change', 'diff', 'volume', 'diff_vol', 'chdegree', 
+                    'sojinrate', 'changerate', 'fpvolume', 'covolume', 
+                    'value', 'ppvolume', 'o_sign', 'o_change', 'o_diff', 
+                    'h_sign', 'h_change', 'h_diff', 'l_sign', 'l_change', 
+                    'l_diff', 'marketcap'] 
+        result = self._execute_query("t1305", 
+                                "t1305InBlock", 
+                                "t1305OutBlock1",
+                                *out_params,
+                                **in_params)
+
+        for item in result:
+            item["code"] = code
+
+        return result
+
+
+    def get_credit_trend_by_code(self, code=None, date=None):
+        """TR: t1921 신용거래동향 
+        :param code:str 종목코드
+        :param date:str 날짜 8자리 ex) 20190222
+        """
+        in_params = {"gubun":"0", "shcode":code, "date":date, "idx":"0"}
+        out_params =["mmdate", "close", "sign", "jchange", "diff", "nvolume",
+                    "svolume", "jvolume", "price", "change", "gyrate", "jkrate"
+                    "shcode"]
+
+        result = self._execute_query("t1921",
+                                    "t1921InBlock",
+                                    "t1921OutBlock1",
+                                    *out_params,
+                                    **in_params)
+        for item in result:
+            item["code"] = code
+
+        return result
+
+
+    def get_agent_trend_by_code(self, code=None ,fromdt=None, todt=None):
+        """TR: t1717 외인기관별 종목별 동향
+        :param code:str 종목코드
+        :param fromdt:str 조회 시작 날짜
+        :param todt:str 조회 종료 날짜
+        :return result:list 시장 별 종목 리스트
+        """
+        in_params = {"gubun":"0", "fromdt":fromdt, "todt":todt, "shcode":code}
+        out_params =["date", "close", "sign", "change", "diff", "volume", 
+                    "tjj0000_vol", "tjj0001_vol", "tjj0002_vol", "tjj0003_vol",
+                    "tjj0004_vol", "tjj0005_vol","tjj0006_vol", "tjj0007_vol",
+                    "tjj0008_vol", "tjj0009_vol", "tjj0010_vol", "tjj0011_vol",
+                    "tjj0018_vol", "tjj0016_vol", "tjj0017_vol", "tjj0001_dan",
+                    "tjj0002_dan", "tjj0003_dan", "tjj0004_dan", "tjj0005_dan",
+                    "tjj0006_dan", "tjj0007_dan", "tjj0008_dan", "tjj0009_dan",
+                    "tjj0010_dan", "tjj0011_dan", "tjj0018_dan", "tjj0016_dan",
+                    "tjj0017_dan" ] 
+        result = self._execute_query("t1717",
+                                    "t1717InBlock",
+                                    "t1717OutBlock",
+                                    *out_params,
+                                    **in_params)
+        for item in result:
+            item["code"] = code
+
+        return result
+
+    def get_short_trend_by_code(self, code=None, sdate=None, edate=None):
+        """TR: t1927 공매도일별추이
+        :param code:str 종목코드
+        :param sdate:str 시작일자 
+        :param edate:str 종료일자
+        :return result:list 시장 별 종목 리스트
+        """
+        in_params = {"date":sdate, "sdate":sdate, "edate":edate, "shcode":code}
+        out_params =["date", "price", "sign", "change", "diff", "volume", "value", 
+                    "gm_vo", "gm_va", "gm_per", "gm_avg", "gm_vo_sum"]
+
+        result = self._execute_query("t1927",
+                                    "t1927InBlock",
+                                    "t1927OutBlock1",
+                                    *out_params,
+                                    **in_params)
+
+        for item in result:
+            item["code"] = code
+
+        return result
 
 class XAQuery:
     RES_PATH = "C:\\eBest\\xingAPI\\Res\\"
@@ -677,3 +789,7 @@ class Field:
             "IsuNm":"종목명"
         }
     }
+
+
+
+
