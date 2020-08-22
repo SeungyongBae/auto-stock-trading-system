@@ -26,7 +26,7 @@ class Data():
         request_url =self.CORP_CODE_URL+"?"
         for k, v in query_params.items():
             request_url = request_url + k + "=" + v +"&"
-        print(request_url)
+        #print(request_url)
         res = requests.get(request_url[:-1])
         root = ET.fromstring(res.text)
         from_tags = root.iter("items")
@@ -49,7 +49,7 @@ class Data():
         request_url =self.CORP_INFO_URL+"?"
         for k, v in query_params.items():
             request_url = request_url + k + "=" + v +"&"
-        print(request_url)
+        #print(request_url)
         res = requests.get(request_url[:-1])
         root = ET.fromstring(res.text)
         from_tags = root.iter("item")
@@ -79,7 +79,7 @@ class Data():
         request_url =self.STOCK_DISTRIBUTION_URL+"?"
         for k, v in query_params.items():
             request_url = request_url + k + "=" + v +"&"
-        print(request_url)
+        #print(request_url)
         res = requests.get(request_url[:-1])
         root = ET.fromstring(res.text)
         from_tags = root.iter("items")
