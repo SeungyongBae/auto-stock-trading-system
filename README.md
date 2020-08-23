@@ -59,9 +59,9 @@ ___
 ___
 
 **win32 호환성 문제**   
-pywin32	(win32com) -> 32bit에서만 작동  
+pywin32	(win32com) -> 32bit에서만 작동   
 anaconda bit 설정 변경 => set CONDA_FORCE_32BIT=1  
 
 **파일명 mismatch**   
-ex) "t1305.res"를 "t1305 .res"로 찾으려고 함
+ex) "t1305.res"를 "t1305 .res"로 찾으려고 함   
 xa_query.LoadFromResFile(XAQuery.RES_PATH + res + **" .res"**) 코드 수정
