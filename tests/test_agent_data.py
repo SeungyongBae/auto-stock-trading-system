@@ -21,7 +21,7 @@ class TestData(unittest.TestCase):
 
     def test_get_stk_distribution_info(self):
         print(inspect.stack()[0][3])
-        result = self.data.get_stk_distribution_info(code="593", date="20200801")
+        result = self.data.get_stk_distribution_info(code="593", date="20181231")
         assert result is not None
         print(result)
 
