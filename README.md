@@ -68,7 +68,7 @@ anaconda bit 설정 변경 => set CONDA_FORCE_32BIT=1
 ex) "t1305.res"를 "t1305 .res"로 찾으려고 함   
 xa_query.LoadFromResFile(XAQuery.RES_PATH + res + **" .res"**) 코드 수정  
 
-**gitignore 캐시 제거**
+**gitignore 캐시 제거**  
 git rm -r --cached .   
 git add .   
 git commit -m "Fix untracked files"   

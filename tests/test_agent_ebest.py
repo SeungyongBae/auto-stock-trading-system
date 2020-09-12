@@ -2,6 +2,7 @@ import unittest
 from stocklab.agent.ebest import EBest
 import inspect
 import time
+from pprint import pprint
 
 class TestEbest(unittest.TestCase):
     def setUp(self):
@@ -90,3 +91,15 @@ class TestEbest(unittest.TestCase):
         result = self.ebest.get_tick_size(int(price[0]["현재가"]))
         assert result
         print("호가 단위 : " + str(result))
+
+    def test_get_price_n_min_by_code(self):
+        print(inspect.stack()[0][3])
+        result = self.ebest.get_price_n_min_by_code("20200901", "005930")
+        assert result
+        pprint(result)
+
+    def test_get_price_n_min_by_code_tick(self):
+        print(inspect.stack()[0][3])
+        result = self.ebest.get_price_n_min_by_code("20200901", "005930", 0)
+        assert result
+        pprint(result)
