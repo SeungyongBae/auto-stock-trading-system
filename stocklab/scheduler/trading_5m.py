@@ -22,7 +22,7 @@ def check_buy_completed_order(code):
                                                 {"code": code}, 
                                                 {"status": "buy_completed"}
                                             ]}, 
-                                                "stocklab_demo", "order"))
+                                                "autostock", "order"))
     """매도 주문
     """
     for buy_completed_order in buy_completed_order_list:
@@ -35,7 +35,7 @@ def check_buy_completed_order(code):
         print("order_stock", sell_order)
         mongo.update_item({"매수완료.주문번호":buy_order_no}, 
                             {"$set":{"매도주문":sell_order[0], "status":"sell_ordered"}}, 
-                        "stocklab_demo", "order")
+                        "autostock", "order")
 
 def check_buy_order(code):
     """매수주문 완료 체크
@@ -44,7 +44,7 @@ def check_buy_order(code):
                                             {"code": code}, 
                                             {"status":"buy_ordered"}]
                                         }, 
-                                        "stocklab_demo", "order"))
+                                        "autostock", "order"))
     for order in order_list:
         time.sleep(1)
         code = order["code"]
@@ -56,7 +56,7 @@ def check_buy_order(code):
         if order_cnt == result_cnt:
             mongo.update_item({"매수주문.주문번호":order_no}, 
                                 {"$set":{"매수완료":check_result, "status":"buy_completed"}}, 
-                            "stocklab_demo", "order")
+                            "autostock", "order")
             print("매수완료", check_result)
     return len(order_list)
 
@@ -66,7 +66,7 @@ def check_sell_order(code):
                                             {"code": code}, 
                                             {"status": "sell_ordered"}
                                         ]}, 
-                                            "stocklab_demo", "order"))        
+                                            "autostock", "order"))        
     for order in sell_order_list:
         time.sleep(1)
         code = order["code"]
@@ -78,7 +78,7 @@ def check_sell_order(code):
         if order_cnt == result_cnt:
             mongo.update_item({"매도주문.주문번호":order_no}, 
                             {"$set":{"매도완료":check_result, "status":"sell_completed"}}, 
-                            "stocklab_demo", "order")
+                            "autostock", "order")
             print("매도완료", check_result)
     return len(sell_order_list)
   
@@ -100,7 +100,7 @@ def trading_scenario(code_list):
             print("order_stock", order)
             order_doc = order[0]
             mongo.insert_item({"매수주문":order_doc, "code":code, "status": "buy_ordered"}, 
-                            "stocklab_demo", "order")
+                            "autostock", "order")
         check_sell_order(code)
 
 if __name__ == '__main__':
