@@ -51,10 +51,12 @@ ___
 
 
 ___
-[용어 정리]
+[패키지 구성]
 
-- 등락율 = (현재가 - 전날종가) / 전날종가 * 100
-- 고가대비 = (현재가 - 고가) / 고가 * 100
+- conf : 사용자 정보 저장  
+- agent : 수집, 매매, 지원 모듈  
+- db_handler : DB저장, 변경 지원 모듈  
+- scheduler : 스케줄러 모듈  
 
 ___
 
@@ -64,4 +66,9 @@ anaconda bit 설정 변경 => set CONDA_FORCE_32BIT=1
 
 **파일명 mismatch**   
 ex) "t1305.res"를 "t1305 .res"로 찾으려고 함   
-xa_query.LoadFromResFile(XAQuery.RES_PATH + res + **" .res"**) 코드 수정
+xa_query.LoadFromResFile(XAQuery.RES_PATH + res + **" .res"**) 코드 수정  
+
+**gitignore 캐시 제거**
+git rm -r --cached .   
+git add .   
+git commit -m "Fix untracked files"   
